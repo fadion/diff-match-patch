@@ -1,5 +1,5 @@
 {
-    "name": "yetanotherape/diff-match-patch",
+    "name": "fadion/diff-match-patch",
     "description": "Port of the google-diff-match-patch (https://code.google.com/p/google-diff-match-patch/) lib to PHP",
     "type": "library",
     "keywords": ["Diff", "Match", "Patch", "Fuzzy search"],

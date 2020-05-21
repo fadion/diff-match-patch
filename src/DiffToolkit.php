@@ -314,6 +314,64 @@ class DiffToolkit {
     }
 
     /**
+     * Split two texts into an array of strings.  Reduce the texts to a string of hashes where each
+     * Unicode character represents one line.
+     *
+     * @param string $text1 First string.
+     * @param string $text2 Second string.
+     *
+     * @return array Three element array, containing the encoded text1, the encoded text2 and the array
+     * of unique strings.  The zeroth element of the array of unique strings is intentionally blank.
+     */
+    public function linesToWords($text1, $text2)
+    {
+        $lineArray = array();
+        $lineHash = array();
+        $lineArray[] = '';
+
+        $chars1 = $this->linesToWordsMunge($text1, $lineArray, $lineHash);
+        $chars2 = $this->linesToWordsMunge($text2, $lineArray, $lineHash);
+
+        return array($chars1, $chars2, $lineArray);
+    }
+
+    /**
+     * Split a text into an array of strings.  Reduce the texts to a string of hashes where each
+     * Unicode character represents one line.
+     * Modifies $lineArray and $lineHash.
+     *
+     * @param string $text String to encode.
+     * @param array  $lineArray
+     * @param array  $lineHash
+     *
+     * @return string Encoded string.
+     */
+    protected function linesToWordsMunge($text, array &$lineArray, array &$lineHash)
+    {
+        $chars = '';
+        $delimiter = iconv('UTF-8', mb_internal_encoding(), ' ');
+        $lines = explode($delimiter, $text);
+
+        $last_line_has_delimiter = end($lines) === '';
+        if ($last_line_has_delimiter) {
+            array_pop($lines);
+        }
+
+        foreach ($lines as $i => $line) {
+            if (isset($lines[$i + 1]) || $last_line_has_delimiter) {
+                $line .= $delimiter;
+            }
+            if (!isset($lineHash[$line])) {
+                $lineArray[] = $line;
+                $lineHash[$line] = count($lineArray) - 1;
+            }
+            $chars .= Utils::unicodeChr($lineHash[$line]);
+        }
+
+        return $chars;
+    }
+
+    /**
      * Rehydrate the text in a diff from a string of line hashes to real lines of text.
      * Modifies $diffs. TODO try to fix it!
      *
